@@ -1,9 +1,23 @@
-# macOS 本地适配（个人 fork，不打算合并回上游）
+# macOS 本地适配（非官方个人 fork）
 
-> 这个分支只为一件事：让 **dsh-boot-suite 在自己的 Mac 上能用**，并且能持续跟作者仓库同步。
-> 上游是 Windows 优先的（`README` 徽章写的是 Windows | Web），本分支不打算提 PR。
+> ⚠️ **这不是官方版本，和原作者没有隶属或背书关系。**
+>
+> 原项目：[**dsh-boot-suite**](https://github.com/LeeRolling/dsh-boot-suite) · 作者：**沈宏宏 · [LeeRolling](https://github.com/LeeRolling)** · MIT License
+>
+> 本仓库是 macOS 用户的个人自用适配：只补 mac 上跑不通的地方 + 本地安装/同步脚本。
+> **Windows 代码路径一行未改**；Windows 用户请直接使用原仓库和作者的 Release。
+> 原作者没有审核过这份改动；如果作者认为不合适，本 fork 会停止公开。
 
-基线：上游 `v2.13.0`（commit `147fec0`）· 本机 DSH 0.2.1-rc.3 · macOS 26.3.1
+基线：上游 `v2.13.0`（commit `147fec0`）· DSH 0.2.1-rc.3 · macOS 26.3.1
+
+## 适合谁 / 不适合谁
+
+| | |
+|---|---|
+| **适合** | 会用终端、能接受 `link:` 方式安装的 macOS 用户；想自己改代码/换模板的人 |
+| **不适合** | 想要图形安装包或一键更新的用户（mac 上更新 = `git` 同步 + 重开 DSH） |
+| **另有官方版本** | Windows 用户请用[原作者仓库](https://github.com/LeeRolling/dsh-boot-suite)，功能、发布包、更新都由作者维护 |
+| **支持承诺** | 没有。可以提 issue，但这是个人 fork，不保证响应；和原作者无关 |
 
 ## 分支模型
 
@@ -88,8 +102,10 @@ launchd 任务的行为（= `sync-upstream.sh --auto`）：
 
 ## 自己的 fork
 
+> 如果你要复用这套东西：先把 `origin` 换成你自己的账号（下面命令），否则 `--push` 会推到本仓库。
+
 ```bash
-git remote add origin git@github.com:<你的账号>/dsh-boot-suite.git
+git remote set-url origin git@github.com:<你的账号>/dsh-boot-suite.git
 git push -u origin main
 git push -u origin mac
 ```
@@ -118,10 +134,16 @@ Host github.com
   User git
 ```
 
+## 署名与许可
+
+- 原项目、模板、素材、文档的版权与署名归原作者 **沈宏宏 · LeeRolling**；`LICENSE` 和 `package.json` 的 `author` 保持原样未改。
+- 本 fork 新增的脚本与文档（`tools/*-mac*`、`tools/mac-profile.mjs`、`tools/sync-upstream.sh`、`LOCAL-MAC.md`、`*.command`）同样按 **MIT** 授权，可自由取用、修改、甚至整理成 PR 提回上游。
+- 转载/再分发请保留原作者署名和本声明，不要把它说成官方版本。
+
 ## 已知限制
 
 - **插件内建更新在 macOS 上不可用**：设置页仍会提示「有新版本」，点更新会提示改用 git 同步（代码里已拦截）。mac 上的更新 = `sync-upstream.sh --apply` + 重开 DSH。
-- `README.md` / `INSTALL.md` / `DESKTOP.md` 仍是作者的 Windows 口径，刻意没改（减少和上游的冲突）。
+- `README.md` 顶部加了一段非官方声明（方便从 fork 进来的人认出来），其余内容保持作者原样；`INSTALL.md` / `DESKTOP.md` 仍是作者的 Windows 口径，刻意不改（减少和上游的冲突）。
 - `tools/build-release.mjs`、`tools/*.ps1`、`*.cmd` 是 Windows 发布/安装用的，mac 上用不到，没动。
 - 上游如果自己修了这两个路径 bug，rebase 可能冲突：确认后 `git rebase --skip` 丢掉我们的补丁即可（补丁只有几行，删起来很快）。
 - 本分支是个人维护，没跑过 Windows 侧；Windows 行为依赖「原代码不动」这个约定来保证。

@@ -1,5 +1,11 @@
 # dsh-boot-suite
 
+> ⚠️ **这是 macOS 个人适配 fork（非官方，和原作者无隶属/背书关系）**
+> 原作者：**沈宏宏 · [LeeRolling](https://github.com/LeeRolling)** · 原仓库：https://github.com/LeeRolling/dsh-boot-suite
+> 本 fork 只在原版上补 macOS 适配 + 本地安装/同步脚本，**Windows 代码路径未改**。
+> **macOS 用户**：安装、同步、已知限制见 [LOCAL-MAC.md](LOCAL-MAC.md)（需要会用终端，无图形安装包）。
+> **Windows 用户 / 想要官方支持**：请使用原仓库及其 Release。
+
 > **DeepSeek Harness 开机套件** —— 六幕开机动画 + 聊天壁纸。
 > 一个插件，两个半侧：**冷启动的仪式感**，和**进入聊天后的那张底图**。
 > v2.2.0 起**分幕是数据**：可以换成任意幕数（1~24）的模板。
