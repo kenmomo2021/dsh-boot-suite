@@ -59,6 +59,17 @@ notify() {
 }
 die() { log "[x] $*"; notify "同步中止"; exit 1; }
 
+# 测试失败时回滚：当前安装是 link 指向工作区，留着坏代码会直接影响下次打开 DSH。
+# 失败现场存到 mac-sync-failed 分支，一条都没丢，方便事后排查。
+rollback_sync() {
+  git branch -f mac-sync-failed HEAD >/dev/null 2>&1 || true
+  git reset --hard "$PRE_SYNC_REV" >/dev/null 2>&1 || true
+  log "[x] npm test 失败，已回滚到同步前（${PRE_SYNC_REV}）"
+  log "    失败现场保留在 mac-sync-failed 分支：git log --oneline mac-sync-failed / git diff mac mac-sync-failed"
+  notify "测试失败，已回滚"
+  exit 1
+}
+
 [ -d .git ] || die "不是 git 仓库：$REPO_ROOT"
 git remote get-url upstream >/dev/null 2>&1 || die "缺少 upstream 远端。先执行：git remote add upstream https://github.com/LeeRolling/dsh-boot-suite.git"
 
@@ -100,6 +111,7 @@ if [ "$BEHIND" = 0 ]; then
   exit 0
 fi
 
+PRE_SYNC_REV="$(git rev-parse HEAD)"
 log "开始同步：mac 落后 upstream/main $BEHIND 个提交（目标 ${UPSTREAM_REV}）"
 if ! git rebase upstream/main; then
   git rebase --abort || true
@@ -109,18 +121,14 @@ if ! git rebase upstream/main; then
 fi
 log "rebase 完成：$(git log --oneline -1)"
 
+# 测试时清掉外部 DSH_HOME：作者的部分 smoke 会自己建临时 HOME，
+# 外部 DSH_HOME 会污染它们（实测会出现 1 项误报）。
 if [ "$MODE" = "auto" ]; then
-  if ! npm test >>"$LOG" 2>&1; then
-    log "[!] rebase 成功但 npm test 失败：当前 mac 分支已更新，请手动检查（git switch mac / npm test）"
-    notify "测试失败，请检查"
-    exit 1
-  fi
+  if ! ( unset DSH_HOME; npm test ) >>"$LOG" 2>&1; then rollback_sync; fi
 else
-  if ! npm test; then
-    log "[!] rebase 成功但 npm test 失败：当前 mac 分支已更新，请手动检查"
-    exit 1
-  fi
+  if ! ( unset DSH_HOME; npm test ); then rollback_sync; fi
 fi
+
 
 # main 只是 upstream 的镜像，同步后强制指过去（不检出、不改工作区）
 git branch -f main upstream/main

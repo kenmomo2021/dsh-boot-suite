@@ -62,7 +62,9 @@ upstream/main ──► main（镜像分支）
 
 流程：`git fetch upstream` → `git rebase upstream/main` → `npm test` → `git branch -f main upstream/main`。
 
-- 冲突或测试失败：自动 `git rebase --abort`，保持同步前状态
+- 冲突：自动 `git rebase --abort`，保持同步前状态
+- 测试失败：自动回滚到同步前，失败现场存到 `mac-sync-failed` 分支
+  （`git diff mac mac-sync-failed` 查看；确认不要了就 `git branch -D mac-sync-failed`）
 - 已开 `git rerere`，同一处冲突下次会复用上次解法
 - 同步后**重开 DSH** 生效
 
