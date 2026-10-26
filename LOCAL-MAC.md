@@ -89,7 +89,7 @@ launchd 任务的行为（= `sync-upstream.sh --auto`）：
 ## 自己的 fork
 
 ```bash
-git remote add origin https://github.com/<你的账号>/dsh-boot-suite.git
+git remote add origin git@github.com:<你的账号>/dsh-boot-suite.git
 git push -u origin main
 git push -u origin mac
 ```
@@ -98,6 +98,24 @@ git push -u origin mac
 
 ```bash
 ./tools/sync-upstream.sh --apply --push
+```
+
+### 本机网络的坑：SSH 必须走 443
+
+这台机器的代理（TUN 模式）会掐掉 `github.com:22`，直连 SSH 22 会被 `198.18.0.88` 关闭。
+已在本仓库里配好：
+
+```bash
+git config core.sshCommand "ssh -o Hostname=ssh.github.com -p 443 -o StrictHostKeyChecking=accept-new"
+```
+
+所以在本仓库 `git push` 直接能用。想全局生效，在 `~/.ssh/config` 里加：
+
+```
+Host github.com
+  HostName ssh.github.com
+  Port 443
+  User git
 ```
 
 ## 已知限制
